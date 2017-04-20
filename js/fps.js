@@ -26,6 +26,6 @@ let measureFPS = function(newTime){
    }
    // and display it in an element we appended to the
    // document in the start() function
-   fpsContainer.innerHTML = 'FPS: ' + fps;
+   //fpsContainer.innerHTML = 'FPS: ' + fps;
    frameCount++;
 };

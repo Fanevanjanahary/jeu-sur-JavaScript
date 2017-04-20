@@ -30,26 +30,23 @@ function MoteurJeu() {
 	    let couleur = "white";
 	    let vx = 6; 
 	    let vy = 6;
-	    //console.log(couleur)
 	    
 	     let b= new Balle(x, y, rayon, couleur, vx, vy);
-	  
-	    // On vérifie que la balle n'est pas sur le joueur
-	    // Si c'est le cas on la saute et on n'incrémente
-	    // pas la variable de boucle i
 	    if(!circRectsOverlap(barre.x, barre.y,
 	                        barre.width+100, barre.height+100,
 	                        b.x, b.y, b.rayon)) {
-	      // pas de collision
-	      // // on la rajoute au tableau des balles
-	      tableauxDesBalles.push(b);
-	    } else {
-	      // on décrémente i pour "annuler" ce tour
-	      // de boucle
+		  	tableauxDesBalles.push(b);
+	      
+	    } else 
 	      i--;
-	      console.log('BALLE NON CREE CAR SUR JOUEUR')
-	    }
+	    balleTimeout = setTimeout(function() {
+						creerDesBalles(nbBalles);
+				}, 4000); 
+			if(lesBriques<3){ 
+					window.clearTimeout(balleTimeout); 
+			}
 	  }
+		 
 	}
   function creerChaineBalles(nbr){
 			creerDesBalles(2*nbr);
@@ -148,8 +145,9 @@ function showNbrBombe() {
             if (b.x < b.x && b.y + b.r > brq.y && b.y - b.r < brq.y + brq.height
 			    || b.x > brq.x + brq.width && b.y + b.r > brq.y && b.y - b.r < brq.y + brq.height )
                 b.vx *= -1;
-            else
-                b.vy *= -1;		
+            else{
+                b.vy *= -1;	
+						}	
 						
 						if (lesBriques[i].life == 1){
                delete lesBriques[i];
@@ -173,6 +171,7 @@ function showNbrBombe() {
 	    b.move();
 	    testeCollisionBalleAvecMurs(b);
 	  });
+		
 	}
 	
  function dessinerLesBriques(lesBriques){
@@ -227,7 +226,7 @@ function showNbrBombe() {
 	// PROGRAMME PRINCIPAL
 	function start() {
 		// ici le programme principal
-		initFPS();
+	  initFPS();
 
 		// pour éviter this partout dans le code
 		canvas = document.querySelector("#myCanvas");
