@@ -1,23 +1,25 @@
-class Brique {
-  constructor(x, y, couleur) {
-    // appel du constructeur hérité
-    super(x, y, couleur);
-    this.rayon = rayon;
-  }
+class Brique extends ObjetGraphique{
   
-  draw(ctx) {
-    // Pour dessiner un cercle, faire comme ceci
-    // j'explique après...
-    ctx.save(); // bonne pratique
-    ctx.translate(this.x, this.y);
+  constructor(x, y, width,height,couleur,life) {
+     super(x, y, couleur, 0, 0);
+     this.life=life;
     
-    // On dessine en 0,0
-    ctx.fillStyle = this.couleur;
-    ctx.fillRect(0, 0, this.width, this.height);
     
-    ctx.restore();
-    
-    // Appel de la méthode héritée
-    super.draw(ctx);
   }
+
+  draw(ctx) {
+      ctx.save();
+  
+      ctx.translate(this.x, this.y);
+  
+      // Le corps du barre
+      ctx.fillStyle = this.couleur;
+      this.width=50; this.height=20;
+      ctx.fillRect(0, 0, this.width, this.height);
+
+
+      ctx.restore();    
+  } // ici pas de virgule !!!
+
+  
 }

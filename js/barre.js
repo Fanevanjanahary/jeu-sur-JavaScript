@@ -1,5 +1,5 @@
 // Syntaxe 1 : objet "singleton"
-let monstre = {
+let barre = {
   // propriétés
   x:100,
   y:650,
@@ -26,7 +26,7 @@ let monstre = {
   
       ctx.translate(this.x, this.y);
   
-      // Le corps du monstre
+      // Le corps du barre
       ctx.fillStyle = this.couleurCorps;
       ctx.fillRect(0, 0, this.width, this.height);
 

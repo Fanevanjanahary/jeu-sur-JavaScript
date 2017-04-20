@@ -3,35 +3,42 @@ let jeu;
 
 function init() {
 	let canvas = document.querySelector("#myCanvas");
-
     jeu = new MoteurJeu(canvas);
-	jeu.start();
+	  jeu.start();
 }
 
 function MoteurJeu() {
 	let canvas, ctx, width, height;
 	let tableauxDesBalles = [];
+	let lesBriques = new Array();
+	let x=7;let y=60;
+	let width_b=55;
+  let height_b=25;
+	let nbCol=8;
+	let nbLigne=7;
+	let couleurBrique = ["#ff0000","#ff6699","#993399","#3366ff","#33ccff","#99ff99","#33cc33"];
+	let score=0;
+	let nbrBombe=0;
+	
 
 	function creerDesBalles(nbBalles) {
 	  for(let i = 0; i < nbBalles; i++) {
-	    let x = Math.random() * width; // Math.random() renvoie un nombre entre 0 et 1
-	    let y = Math.random() * mur.y; 
-	    let rayon = 2 + Math.random() * 10; // rayon entre 2 et 12
-	    let R = Math.round(255 *Math.random()); // valeur entre 0 et 255
-	    let G = Math.round(255 *Math.random());
-	    let B = Math.round(255 *Math.random());
-	    let couleur = "rgb(" + R + "," + G + "," + B +")";
-	    let vx = 1+Math.random() *5; // entre 1 et 5
-	    let vy = 1+Math.random() *5;
+	    let x = Math.random() * 420; 
+	    let y = 300; 
+	    let rayon = 10; 
+	
+	    let couleur = "white";
+	    let vx = 6; 
+	    let vy = 6;
 	    //console.log(couleur)
 	    
-	    let b = new Balle(x, y, rayon, couleur, vx, vy);
+	     let b= new Balle(x, y, rayon, couleur, vx, vy);
 	  
 	    // On vérifie que la balle n'est pas sur le joueur
 	    // Si c'est le cas on la saute et on n'incrémente
 	    // pas la variable de boucle i
-	    if(!circRectsOverlap(monstre.x, monstre.y,
-	                        monstre.width+100, monstre.height+100,
+	    if(!circRectsOverlap(barre.x, barre.y,
+	                        barre.width+100, barre.height+100,
 	                        b.x, b.y, b.rayon)) {
 	      // pas de collision
 	      // // on la rajoute au tableau des balles
@@ -44,9 +51,44 @@ function MoteurJeu() {
 	    }
 	  }
 	}
+  function creerChaineBalles(nbr){
+			creerDesBalles(2*nbr);
+	}
+	function createLesBrique()
+	{
+		
+		 for(let i = 0; i < nbCol; i++) {
+			for(let j = 0; j < nbLigne; j++) {
+						
+						let briq= new Brique(x+(width_b*i),y+(height_b*j),0, 0,couleurBrique[j],2);
+						lesBriques.push(briq);
+					
+				}
+
+		 }
+		 
+	}
+
+//Affichage score
+		function showScore() {
+      ctx.fillStyle = "white";                
+      ctx.font = "bold 16px Arial";
+      ctx.fillText("Score: "+score, 25, 40);
+			
+  }
+
+//Affichage nombre bombe
+function showNbrBombe() {
+      ctx.fillStyle = "white";                
+      ctx.font = "bold 16px Arial";
+      ctx.fillText("Nombre Bombe: "+nbrBombe, 270, 40);
+			
+  }
 
 	// ICI BOUCLE D'animation à 60 images/s
 	function mainLoop(time) {
+			
+		
   		measureFPS(time);
   
 		// 1 - on efface le contenu du canvas
@@ -54,14 +96,21 @@ function MoteurJeu() {
   
   		// 2 - on dessine le joueur, les ennemis, le score
   		// etc.
+	  	showScore();
+			showNbrBombe()
   		mur.draw(ctx);
-  		monstre.draw(ctx);
+  		barre.draw(ctx);
+ 			dessinerLesBriques(lesBriques);
   		dessinerEtDeplacerLesBalles();
+			
   		
   		// 3 - on deplace, on teste les collisions
-	  	monstre.deplace();
-   		testeCollisionMonstreAvecMurs();  
-  		testerCollisionJoueurAvecBalles();
+	  	barre.deplace();
+   		testeCollisionbarreAvecMurs();  
+  		testerCollisionAttrapAvecBalles();
+			
+		 
+			
   
   		// 4 - on redemande une nouvelle frame d'animation
   		// on demande au browser UNE frame d'animation
@@ -69,31 +118,55 @@ function MoteurJeu() {
   		requestAnimationFrame(mainLoop);
 	}
 
-	function testerCollisionJoueurAvecBalles() {
+	function testerCollisionAttrapAvecBalles() {
     	tableauxDesBalles.forEach(function(b, index, tab) {
-    
-	    if(circRectsOverlap(monstre.x, monstre.y,
-	                       monstre.width, monstre.height,
+				
+	    if(circRectsOverlap(barre.x, barre.y,
+	                       barre.width, barre.height,
 	                       b.x, b.y, b.rayon)) {
-	      console.log("collision");
+
 	      tableauxDesBalles.splice(index, 1);
+				score+=100;
+
 	    }
-	  });
+	  }
+			);
+	}
+
+	function testerCollisionBriqueAvecBalles(brq,i) {
+		
+			tableauxDesBalles.forEach(function(b, index, tab) {
+				if (brq.x >= b.x+b.rayon + 1 || brq.x + brq.width <= b.x-b.rayon - 1 || brq.y >= b.y+ b.rayon + 1 || brq.y +brq.height <= b.y- b.rayon - 1 )
+            return false;
+				if (!i) {
+            if (!(brq.x < b.x1 -b.rayon - 15 && brq.x + brq.width > b.x +b.rayon + 15))
+                b.vx *= -1;
+								b.vy *= -1;
+        }
+				else {
+
+            if (b.x < b.x && b.y + b.r > brq.y && b.y - b.r < brq.y + brq.height
+			    || b.x > brq.x + brq.width && b.y + b.r > brq.y && b.y - b.r < brq.y + brq.height )
+                b.vx *= -1;
+            else
+                b.vy *= -1;		
+						
+						if (lesBriques[i].life == 1){
+               delete lesBriques[i];
+							 }
+            else{
+               lesBriques[i].life--;
+							 lesBriques[i].couleur="white";
+						}
+				}
+				return true;			
+				
+				});
+			
 	}
 
 	function dessinerEtDeplacerLesBalles() {
-	  /*
-	  // autre syntaxe
-	  for(let i = 0; i < tableauxDesBalles.length;i++) {
-	    var b = tableauxDesBalles[i];
-	        b.draw(ctx);
-	    b.move();
-	    testeCollisionBalleAvecMurs(b);
-
-	  }
-	  */
 	  
-	  // ici avec un itérateur
 	  tableauxDesBalles.forEach(function(b, index, tab) {
 	    // b est une balle dans la collection
 	    b.draw(ctx);
@@ -101,36 +174,55 @@ function MoteurJeu() {
 	    testeCollisionBalleAvecMurs(b);
 	  });
 	}
-
+	
+ function dessinerLesBriques(lesBriques){
+	 	
+	 ctx.beginPath();
+        for (var i = 0; i < lesBriques.length; i++) {
+            if (lesBriques[i]) {
+                lesBriques[i].draw(ctx);
+                testerCollisionBriqueAvecBalles(lesBriques[i],i);
+            }
+        }
+ }
 	function testeCollisionBalleAvecMurs(b) {
-	  if(((b.x + b.rayon) > width) || ((b.x - b.rayon) < 0)) {
+	  if(((b.x + b.rayon) >= width) || ((b.x - b.rayon) <= 0)) {
 	    // on a touché un bord vertical
 	    // on inverse la vitesse en x
-	    b.vx = -b.vx;
+	    b.vx *= -1;
 	    
 	  }
-	  if(((b.y + b.rayon) > mur.y) || ((b.y - b.rayon) < 0)) {
+		
+	  if(((b.y + b.rayon) >= mur.y) || ((b.x - b.rayon) <= 0 ))  {
 	    // on a touché un bord vertical
 	    // on inverse la vitesse en x
-	    b.vy = -b.vy;
-	  }
-	}
+	    b.vy *= -1;
+			if(b.couleur.localeCompare("white")==0)
+			{
+				b.couleur="#ffdd99";
+			}
+			else {b.couleur="#ff0000";}
+	  
+		}
+	 }
+
 	
-	function testeCollisionMonstreAvecMurs() {
-	    if((monstre.x+monstre.width) > canvas.width) {
-	      // BONNE PRATIQUE : toujours se remettre à la position
-	      // de contact. Si jamais on est allé "trop loin"
-	      // on va rester en position de collision et rester
-	      // "collé au mur"
-	    monstre.x = canvas.width - monstre.width;
-	    monstre.v = -monstre.v;
-	  } else if(monstre.x < 0) {
+	function testeCollisionbarreAvecMurs() {
+	    if((barre.x+barre.width) > canvas.width) {
+	      
+	    barre.x = canvas.width - barre.width;
+	    barre.v = -barre.v;
+	  } else if(barre.x < 0) {
 	    // idem
-	    monstre.x = 0;
-	    monstre.v = -monstre.v;
+	    barre.x = 0;
+	    barre.v = -barre.v;
 	  }
 	  // A FAIRE : COLLISIONS AVEC MURS HAUT ET BAS !
 	}
+
+  //Affichage score
+
+
 
 	// PROGRAMME PRINCIPAL
 	function start() {
@@ -139,7 +231,6 @@ function MoteurJeu() {
 
 		// pour éviter this partout dans le code
 		canvas = document.querySelector("#myCanvas");
-
 		// propriété
 		this.canvas = document.querySelector("#myCanvas");
 
@@ -148,21 +239,12 @@ function MoteurJeu() {
 
   		ctx = canvas.getContext('2d');
 
-  		// Note : le monstre existe déjà
-  		// puisque défini dans un fichier
-  		// monstre.js déjà lu (on exécute)
-  		// le présent code que quand la
-  		// page a été chargée, donc tous
-  		// les fichiers js lus)
-  		creerDesBalles(3);
-
+			createLesBrique();
+	    creerDesBalles(3);
+			//creerChaineBalles(8);
   		creerLesEcouteurs();
 
-  		// On démarre l'animation que quand
-  		// tout est prêt (on verra tout à
-  		// l'heure qu'il faut par ex avoir
-  		// chargé/lu toutes les images, sons
-  		// etc.)
+  		
   		requestAnimationFrame(mainLoop);
 	}
 

@@ -12,11 +12,11 @@ function creerLesEcouteurs() {
 function boutonSourisEnfonce(evt) {
   //console.log("bouton enfoncé");
   // Ca depend du sens !!!
-  monstre.v = monstre.v *5;
+  barre.v = barre.v *5;
 }
 function boutonSourisRelache(evt) {
   //console.log("bouton relache");
-  monstre.v = Math.sign(monstre.v);
+  barre.v = Math.sign(barre.v);
 }
 function sourisDeplacee(evt) {
   // La ligne suivante tient compte des propriétés
@@ -26,27 +26,27 @@ function sourisDeplacee(evt) {
   //let my = evt.clientY - rect.top;
   
   //console.log("mouse move x = " + mx + " y = " + my);
-  monstre.x = mx;
-  monstre.y = my;
+  barre.x = mx;
+ // barre.y = my;
 }
 function toucheEnfoncee(evt) {
     //console.log("touche enfoncee key = " + evt.key);
   switch(evt.key) {
     case 'ArrowRight' :
       //console.log("fleche à droite");
-      monstre.v = 1;  // CA VA LE FAIRE ALLER A DROITE
+      barre.v = 1;  // CA VA LE FAIRE ALLER A DROITE
                       // CAR ON VA TESTER CA 60 fois
                       // PAR SECONDE DANS LA BOUCLE
                       // D'ANIMATION
       break;
     case 'ArrowLeft' :
       //console.log("fleche à gauche");
-      monstre.v = -1;
+      barre.v = -1;
       break;
   }
 }
 
 function toucheRelachee(evt) {
     //console.log("touche relachee");
-  monstre.vx = 0;
+  barre.vx = 0;
 }
